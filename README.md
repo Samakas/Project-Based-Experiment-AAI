@@ -46,8 +46,8 @@ Flatten the index,confidence.
 Display the result.
 
 ## PROGRAM:
-### Name: KARTHIKEYAN R
-### Reg.No: 212222240046
+### Name: Samakash R S
+### Reg.No: 212223230182
 ### I)Perform ROI from an image
 ```python
 import cv2
