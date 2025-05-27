@@ -1,48 +1,146 @@
-<H3>ENTER YOUR NAME: Samakash R S</H3>
-<H3>ENTER YOUR REGISTER NO: 212223230182</H3>
-<H3>DATE: </H3>
-<H1 Align="center">Project Based Experiment<H1>
-<H3>Objective:<H3>
-To perform sentiment analysis on Facebook data and filter for messages, comments, or posts with negative feedback.
-<H3>Program:</H3>
-  
-  ```py
-import nltk
-from nltk.sentiment import SentimentIntensityAnalyzer
+# project
+## Aim
+To write a python program using OpenCV to do the following image manipulations.
+i) Extract ROI from  an image.
+ii) Perform handwritting detection in an image.
+iii) Perform object detection with label in an image.
+## Software Required:
+Anaconda - Python 3.7
+## Algorithm:
+## I)Perform ROI from an image
+### Step1:
+Import necessary packages 
+### Step2:
+Read the image and convert the image into RGB
+### Step3:
+Display the image
+### Step4:
+Set the pixels to display the ROI 
+### Step5:
+Perform bit wise conjunction of the two arrays  using bitwise_and 
+### Step6:
+Display the segmented ROI from an image.
+## II)Perform handwritting detection in an image
+### Step1:
+Import necessary packages 
+### Step2:
+Define a function to read the image,Convert the image to grayscale,Apply Gaussian blur to reduce noise and improve edge detection,Use Canny edge detector to find edges in the image,Find contours in the edged image,Filter contours based on area to keep only potential text regions,Draw bounding boxes around potential text regions.
+### Step3:
+Display the results.
+## III)Perform object detection with label in an image
+### Step1:
+Import necessary packages 
+### Step2:
+Set and add the config_file,weights to ur folder.
+### Step3:
+Use a pretrained Dnn model (MobileNet-SSD v3)
+### Step4:
+Create a classLabel and print the same
+### Step5:
+Display the image using imshow()
+### Step6:
+Set the model and Threshold to 0.5
+### Step7:
+Flatten the index,confidence.
+### Step8:
+Display the result.
 
-# Download NLTK resources 
-nltk.download('vader_lexicon')
+## PROGRAM:
+### Name: KARTHIKEYAN R
+### Reg.No: 212222240046
+### I)Perform ROI from an image
+```python
+import cv2
+import numpy as np
 
-# Load the sentiment analyzer
-sia = SentimentIntensityAnalyzer()
+image = cv2.imread('Apollo-11-launch.jpg')
+image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+cv2.imshow('Original Image', image_rgb)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+roi_mask = np.zeros_like(image_rgb)
+roi_mask[100:300, 200:400, :] = 255  
+segmented_roi = cv2.bitwise_and(image_rgb, roi_mask)
+cv2.imshow('Segmented ROI', segmented_roi)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
+#### OUTPUT:
+![Screenshot 2025-05-27 202342](https://github.com/user-attachments/assets/83304165-c75e-4b9b-a202-aedd36917880)
 
-# Example Facebook data 
-facebook_data = [
-    "I love the new feature! It's amazing.",
-    "The service was terrible. I'm very disappointed.",
-    "Great job on the update!",
-    "The product quality is poor. I won't be buying again.",
+![Screenshot 2025-05-27 202351](https://github.com/user-attachments/assets/4101bd80-32fe-449a-8643-09cfabed6f7e)
+
+### II)Perform handwritting detection in an image
+
+```python
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+def detect_handwriting(image_path):
+    img = cv2.imread(image_path)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    edges = cv2.Canny(blurred, 50, 150)
+    contours, _ = cv2.findContours(edges.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    min_area = 100
+    text_contours = [cnt for cnt in contours if cv2.contourArea(cnt) > min_area]
+    img_copy = img.copy()
+    for contour in text_contours:
+        x, y, w, h = cv2.boundingRect(contour)
+        cv2.rectangle(img_copy, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        
+    img_rgb = cv2.cvtColor(img_copy, cv2.COLOR_BGR2RGB)
+    plt.imshow(img_rgb)
+    plt.title('Handwriting Detection')
+    plt.axis('off')
+    plt.show()
     
-]
+image_path = 'hand.jpg'
+detect_handwriting(image_path)
+```
+#### OUTPUT:
+![image](https://github.com/user-attachments/assets/fef7f6d4-7016-468b-91b3-471cbea680b1)
 
-# Perform sentiment analysis and filter for negative feedback
-negative_feedback = []
 
-for message in facebook_data:
-    sentiment_score = sia.polarity_scores(message)['compound']
-    if sentiment_score < 0:  # Negative sentiment
-        negative_feedback.append(message)
 
-# Print the negative feedback
-print("Negative Feedback:")
-for feedback in negative_feedback:
-    print(feedback)
+### III)Perform object detection with label in an image
 
- ```
+```python
+config_file='ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
+frozen_model='frozen_inference_graph.pb'
 
-<H3>Output:</H3>
+model=cv2.dnn_DetectionModel(frozen_model,config_file)
 
-![image](https://github.com/PriyankaAnnadurai/Project-Based-Experiment-AAI/assets/118351569/c6211e29-f9ba-41b1-a4b7-74a20541a9cc)
+classLabels = []
+file_name='Labels.txt'
+with open(file_name,'rt')as fpt:
+    classLabels=fpt.read().rstrip('\n').split('\n')
 
-<H3>Inference:</H3>
- A sentiment analysis project using Facebook data provides valuable learning experiences in data handling, text processing, sentiment analysis, and ethical considerations, while also honing communication, problem-solving, and project management skills.
+print(classLabels)
+print(len(classLabels))
+img=cv2.imread('bike1.jpeg')
+plt.imshow(img)
+plt.imshow(cv2.cvtColor(img,cv2.COLOR_BGR2RGB))
+model.setInputSize(320,320)
+model.setInputScale(1.0/127.5)#255/2=127.5
+model.setInputMean((127.5,127.5,127.5))
+model.setInputSwapRB(True)
+ClassIndex,confidence,bbox=model.detect(img,confThreshold=0.5)
+print(ClassIndex)
+font_scale=2
+font=cv2.FONT_HERSHEY_PLAIN
+for ClassInd,conf,boxes in zip(ClassIndex.flatten(),confidence.flatten(),bbox):
+    cv2.rectangle(img,boxes,(0,0,255),2)
+    cv2.putText(img,classLabels[ClassInd-1],(boxes[0]+10,boxes[1]+40),font,fontScale=font_scale,color=(255,0,0),thickness=1)
+plt.imshow(cv2.cvtColor(img,cv2.COLOR_BGR2RGB))
+plt.axis('off')
+plt.show()
+```
+
+#### OUTPUT:
+![image](https://github.com/user-attachments/assets/2385e20f-1a6c-489f-bdbc-93f20f646e58)
+
+
+## Result:
+Thus, a python program using OpenCV for following image manipulations is done successfully
